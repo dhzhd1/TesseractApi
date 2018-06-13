@@ -173,3 +173,20 @@ class Docker:
 		if changes is None or str(changes).strip() == "":
 			changes = None
 		return self.handle.import_image(tarball_name, repository=repository, tag=tag, changes=changes)
+
+	def get_containers(self, all=False):
+		"""
+		get list of containers.
+		:param all: by default is 'False'. It only shows the running containers. otherwise it shows all containers include the stop/exit ones.
+		:return: return the dict of containers.
+		"""
+		return self.handle.containers(all=all)
+
+
+	def create_container(self, args):
+		"""
+		create container according to the passed in parameters
+		:param args: parameters dict
+		:return:  return new container id
+		"""
+		pass

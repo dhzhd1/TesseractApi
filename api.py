@@ -123,7 +123,6 @@ class PushImage(Resource):
 		else:
 			return docker_host.push_image(args['repo_name'], args['tag']), 200
 
-
 class SaveImage(Resource):
 	def post(self):
 		args = parser.parse_args()
@@ -143,11 +142,25 @@ class LoadImage(Resource):
 		else:
 			return invalidate_parameters_warning()
 
+class BuildImage(Resource):
+	#TODO implement the function of build images from dockerfile
+	pass
 
 
 # Docker Container APIs
+class ListContainers(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args['all'] is not None:
+			return docker_host.get_containers(all=True), 200
+		else:
+			return docker_host.get_containers(), 200
 
-
+class CreateContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		new_container = docker_host.create_container(args=args)
+		return new_container, 200
 
 # Setup API resource routing
 
@@ -155,7 +168,6 @@ class LoadImage(Resource):
 api.add_resource(RegistryLogin, '/api/v1/docker/login')
 api.add_resource(DockerInfo, '/api/v1/docker/info')
 api.add_resource(DiskUtilization, '/api/v1/docker/disk_util')
-
 
 # Implementation of Docker Image API Routing
 api.add_resource(ImagesList, '/api/v1/docker/image', '/api/v1/docker/image/<string:id_name>')
@@ -169,11 +181,11 @@ api.add_resource(SaveImage, '/api/v1/docker/image/save')
 api.add_resource(LoadImage, '/api/v1/docker/image/load')
 
 # Implementation of Docker Container API Routing
-
+api.add_resource(ListContainers, '/api/v1/docker/container')
+api.add_resource(CreateContainer, '/api/v1/docker/container/create')
 
 
 
 if __name__ == '__main__':
-
 	app.run(debug=True)
 
