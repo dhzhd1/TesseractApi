@@ -363,3 +363,58 @@ class Docker:
 		                                                   link_local_ips=args['link_local_ips'])
 		return endpoint_dict
 
+	def start_container(self, container_id):
+		"""
+		This func is for start a created container by ID
+		:param container_id: string of container ID or Name Tag
+		:return: dict of status
+		"""
+		return self.handle.start(container_id)
+
+	def stop_container(self, container_id):
+		"""
+		This method is for stopping a running container by ID or Name
+		:param container_id: String of container ID or name
+		:return:  Dict of return status
+		"""
+		return self.handle.stop(container_id)
+
+	def restart_container(self, container_id):
+		"""
+		This function is for restart a container by container id or name
+		:param container_id: string of container id or name
+		:return: dict of status
+		"""
+		return self.handle.restart(container_id)
+
+	def remove_container(self, container_id):
+		"""
+		This function is used for remove a stopped container by ID or Name
+		:param container_id: String of container ID or Name
+		:return: DICT of status
+		"""
+		return self.handle.remove_container(container_id)
+
+	def list_mapping_ports(self, container_id):
+		"""
+		This func will show all of the mapping of host-> container ports.
+		:param container_id:  String of Container Name or ID
+		:return: dict of ports mapping table
+		"""
+		return self.handle.port(container_id)
+
+	def commit_to_image(self, args):
+		"""
+		This function is used for commiting the changed container to a image
+		:param container_id: container id or name
+		:return: dict of status
+		"""
+		return self.handle.commit(container=args.get('container_id'),
+		                          repository=args.get('repo_name'),
+		                          tag=args.get('tag_name'),
+		                          message=args.get('message'),
+		                          author=args.get('author'),
+		                          changes=args.get('changes'),
+		                          conf=args.get('conf'))
+
+

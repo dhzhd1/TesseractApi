@@ -162,6 +162,54 @@ class CreateContainer(Resource):
 		new_container = docker_host.create_container(args=args)
 		return new_container, 200
 
+class StartContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.start_container(args.get('container_id')), 200
+
+class StopContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.stop_container(args.get('container_id')), 200
+
+class RestartContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.restart_container(args.get('container_id')), 200
+
+class RemoveContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.remove_container(args.get('container_id')), 200
+
+class ListMappingPorts(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.list_mapping_ports(args.get('container_id')), 200
+
+class CommitContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None or args.get('repo_name') is None or args.get('tag_name') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.commit_to_image(args), 200
+
 # Setup API resource routing
 
 # Implementation of Docker API routing
@@ -183,6 +231,12 @@ api.add_resource(LoadImage, '/api/v1/docker/image/load')
 # Implementation of Docker Container API Routing
 api.add_resource(ListContainers, '/api/v1/docker/container')
 api.add_resource(CreateContainer, '/api/v1/docker/container/create')
+api.add_resource(StartContainer, '/api/v1/docker/container/start')
+api.add_resource(StopContainer, '/api/v1/docker/container/stop')
+api.add_resource(RestartContainer, '/api/v1/docker/container/restart')
+api.add_resource(RemoveContainer, '/api/v1/docker/container/remove')
+api.add_resource(ListMappingPorts, '/api/v1/docker/container/port')
+api.add_resource(CommitContainer, '/api/v1/docker/container/commit')
 
 
 
