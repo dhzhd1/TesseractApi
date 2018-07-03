@@ -406,7 +406,7 @@ class Docker:
 	def commit_to_image(self, args):
 		"""
 		This function is used for commiting the changed container to a image
-		:param container_id: container id or name
+		:param args[container_id]: container id or name
 		:return: dict of status
 		"""
 		return self.handle.commit(container=args.get('container_id'),
@@ -417,4 +417,35 @@ class Docker:
 		                          changes=args.get('changes'),
 		                          conf=args.get('conf'))
 
+	def pull_container_log(self, args):
+		"""
+		Pull logs of a running container
+		:param args: args[container_id]: container id or name
+		:return: return list of log lines
+		"""
+		return str(self.handle.logs(args['container_id'])).split('\n')
+
+
+	def attach_container(self, container_id):
+		# This 'attach' function also allow multiple parameters, this version only implement one
+		# https://docker-py.readthedocs.io/en/stable/containers.html?highlight=exec#docker.models.containers.Container.attach
+		return self.handle.attach(container_id)
+
+	def exec_container(self, args):
+		# there will be more parameters for choose, deployment later
+		# in this version, only pass the 'cmd' parameter into method, other parameters keeps default value.
+		# https://docker-py.readthedocs.io/en/stable/containers.html?highlight=exec#docker.models.containers.Container.exec_run
+
+		return self.handle.exec_run(args['cmd'])
+
+	def container_top(self, args):
+		return self.handle.top(args['container_id'])
+
+
+	def container_res_usage(self, args):
+		# Method 'stats' returns a generator. Need to use next(gen) to get data
+		return self.handle.stats(args['container_id'])
+
+	def container_info(self, args):
+		return  self.handle.inspect_container(args['container_id'])
 

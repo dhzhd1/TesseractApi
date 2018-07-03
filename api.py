@@ -31,7 +31,7 @@ parser = reqparse.RequestParser()
 for param in request_arguments:
 	parser.add_argument(param)
 
-
+# TODO: Rename all classes to match the partern:  Network-, Docker-, Container-, Image-
 # Docker APIs
 class RegistryLogin(Resource):
 	def post(self):
@@ -40,8 +40,6 @@ class RegistryLogin(Resource):
 			return docker_host.login_registry(args['login_user'], args['login_pass'], args['registry_srv']), 200
 		else:
 			return invalidate_parameters_warning()
-
-
 
 # TODO: wait get_docker_events() function wrapper finished
 # class DockerEvents(Resource):
@@ -144,6 +142,7 @@ class LoadImage(Resource):
 
 class BuildImage(Resource):
 	#TODO implement the function of build images from dockerfile
+	# https://docker-py.readthedocs.io/en/stable/api.html#module-docker.api.build
 	pass
 
 
@@ -210,6 +209,201 @@ class CommitContainer(Resource):
 		else:
 			return docker_host.commit_to_image(args), 200
 
+class ExecContainer(Resource):
+	# Container 'exec' function and redirect the console to a web based terminal console.
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return  invalidate_parameters_warning()
+		else:
+			if args.get('cmd') is None:
+				return docker_host.attach_container(args['container_id'])
+			else:
+				return docker_host.exec_container(args['container_id'], args['cmd']), 200
+
+class AttachContainer(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.attach_container(args['container_id'])
+
+class ContainerLog(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return  invalidate_parameters_warning()
+		else:
+			return docker_host.pull_container_log(args), 200
+
+class DisplayContainerProcesses(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.container_top(), 200
+
+class ContainerResourceUsage(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.container_res_usage(args), 200
+
+class ContainerInfo(Resource):
+	def post(self):
+		args = parser.parse_args()
+		if args.get('container_id') is None:
+			return invalidate_parameters_warning()
+		else:
+			return docker_host.container_info(args), 200
+
+class ExportContainer(Resource):
+	# TODO: Export Container to a Tar file
+	pass
+
+class ImportContainer(Resource):
+	# TODO: Import Tar file to a container
+	pass
+
+# Docker Networking API
+class NetworkConnect(Resource):
+	# TODO: Connect a container to a network
+	def post(self):
+		pass
+
+class NetworkCreate(Resource):
+	# TODO: Create a network
+	def post(self):
+		pass
+
+class NetworkRemove(Resource):
+	# TODO: Remove a network
+	def post(self):
+		pass
+
+class NetworkDisconnect(Resource):
+	# TODO: Disconnect a container from a network
+	def post(self):
+		pass
+
+class NetworkInspect(Resource):
+	# TODO: Display detailed information on one or more networks
+	def post(self):
+		pass
+
+class NetworkList(Resource):
+	# TODO: List Networks
+	def post(self):
+		pass
+
+# Docker Volume API
+class VolumeCreate(Resource):
+	# TODO: Create a volume
+	def post(self):
+		pass
+
+class VolumeRemove(Resource):
+	# TODO: Remove a Volume
+	def post(self):
+		pass
+
+class VolumeInspect(Resource):
+	# TODO: Disply detailed information on one of more volumes
+	def post(self):
+		pass
+
+class VolumeList(Resource):
+	# TODO: List Volumes
+	def post(self):
+		pass
+
+# NOTE: This version is for a single node environment. Swarm support doesn't included.
+#       For later multiple node support will use K8S implementation.
+
+# Tesseract System API
+# User API
+class UserCreate(Resource):
+	# TODO: Create System User
+	def post(self):
+		pass
+
+class UserRemove(Resource):
+	# TODO: Remove a User
+	def post(self):
+		pass
+
+class UserModify(Resource):
+	# TODO: Modify a User
+	def post(self):
+		pass
+
+class UserList(Resource):
+	# TODO: Get all users or search
+	def post(self):
+		pass
+
+class UserChangePassword(Resource):
+	# TODO: Change password for user
+	def post(self):
+		pass
+
+# Group API
+class GroupCreate(Resource):
+	# TODO: Create a group
+	def post(self):
+		pass
+
+class GroupRemove(Resource):
+	# TODO: Remove a group
+	def post(self):
+		pass
+
+class GroupModify(Resource):
+	# TODO: Modify a Group
+	def post(self):
+		pass
+
+class GroupList(Resource):
+	# TODO: List all groups or search
+	def post(self):
+		pass
+
+# System HW Info
+class HwHDD(Resource):
+	# TODO: get all hdd information and utilization
+	def post(self):
+		pass
+
+class HwMemory(Resource):
+	# TODO: get memory information and utilization
+	def post(self):
+		pass
+
+class GpuInfo(Resource):
+	# TODO: get gpu information /could use filter to get specified information/ could specify gpu number /driver ver
+	def post(self):
+		pass
+
+class GpuPowerUtils(Resource):
+	# TODO: get gpu utilization: memory, power,
+	def post(self):
+		pass
+
+class GpuProcesses(Resource):
+	# TODO: get process inforamtion for specified gpu or all gpus
+	def post(self):
+		pass
+
+class GpuPowerCap(Resource):
+	# TODO: get/set gpu power cap
+	def post(self):
+		pass
+
+
 # Setup API resource routing
 
 # Implementation of Docker API routing
@@ -237,7 +431,29 @@ api.add_resource(RestartContainer, '/api/v1/docker/container/restart')
 api.add_resource(RemoveContainer, '/api/v1/docker/container/remove')
 api.add_resource(ListMappingPorts, '/api/v1/docker/container/port')
 api.add_resource(CommitContainer, '/api/v1/docker/container/commit')
+api.add_resource(ExecContainer, '/api/v1/docker/container/exec')
+api.add_resource(ContainerLog, '/api/v1/docker/container/log')
+api.add_resource(DisplayContainerProcesses, '/api/v1/docker/container/top')
+api.add_resource(ContainerResourceUsage, '/api/v1/docker/container/stats')
+api.add_resource(ContainerInfo, '/api/v1/docker/container/inspect')
 
+
+# Implementation of Docker Networking API Routing
+api.add_resource(NetworkCreate, '/api/v1/docker/network/create')
+api.add_resource(NetworkConnect, '/api/v1/docker/network/connect')
+api.add_resource(NetworkDisconnect, '/api/v1/docker/network/disconnect')
+api.add_resource(NetworkInspect, '/api/v1/docker/network/inspect')
+api.add_resource(NetworkList, '/api/v1/docker/network')
+api.add_resource(NetworkRemove, '/api/v1/docker/network/remove')
+
+# Implementation of Docker Volume API Routing
+api.add_resource(VolumeList, '/api/v1/docker/volume')
+api.add_resource(VolumeCreate, '/api/v1/docker/volume/create')
+api.add_resource(VolumeInspect, '/api/v1/docker/volume/inspect')
+api.add_resource(VolumeRemove, '/api/v1/docker/volume/remove')
+
+
+# Implementation of Tesseract System Level API Routing
 
 
 if __name__ == '__main__':
